@@ -61,13 +61,18 @@ angular.module('htmlToPdfSave')
 					function convert(theElement , id) {
 						var quotes = $('div[pdf-save-content='+id+']')[0];
 				        html2canvas(quotes, {
+				        	  onpreloaded: function(){ /* set parent overflow to visible */ 
+				        			$(quotes).find('table:first').parent().css({
+				        				"overflow":"visible","height":'auto','width': 'auto'
+				        			});
+				        		},
 				            onrendered: function(canvas) {
 				            var pdf = new jsPDF('p', 'pt', 'letter');
 				            for (var i = 0; i <= quotes.clientHeight/980; i++) {
 				                var srcImg  = canvas;
 				                var sX      = 0;
 				                var sY      = 980*i; // start 980 pixels down for every new page
-				                var sWidth  = 900;
+				                var sWidth  = quotes.clientWidth;
 				                var sHeight = 980;
 				                var dX      = 0;
 				                var dY      = 0;
@@ -101,6 +106,13 @@ angular.module('htmlToPdfSave')
 				            }
 				            //! after the for loop is finished running, we save the pdf.
 				            pdf.save(broadcastedName);
+
+				            // reverted to original CSS 
+				            $(quotes).find('table:first').parent().css({
+				          		'overflow': 'scroll',
+				          		'height': $(quotes).attr('originalHeight'),
+				          		'width': $(quotes).attr('originalWidth')
+				          	});
 				        }
 				      });
 						/*var element = $('[pdf-save-content='+id+']') ,
