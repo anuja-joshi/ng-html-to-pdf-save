@@ -10,6 +10,10 @@ angular.module('htmlToPdfSave')
 
 	return {
 		restrict: 'A',
+		scope: {
+      beforeCallback:'&beforeCallback',
+      afterCallback: '&afterCallback',
+    },
 		link : function(scope , element , attrs ) {
 			$pdfStorage.pdfSaveButtons.push(element) ;
 
@@ -17,7 +21,14 @@ angular.module('htmlToPdfSave')
 			element.on('click' , function() {
 				var activePdfSaveId = attrs.pdfSaveButton ;
 				var activePdfSaveName = attrs.pdfName;
-				$rootScope.$broadcast('savePdfEvent' , {activePdfSaveId : activePdfSaveId, activePdfSaveName: activePdfSaveName}) ;
+				var beforeCallback = scope.beforeCallback;
+        var afterCallback = scope.afterCallback;
+				$rootScope.$broadcast('savePdfEvent' , {
+					activePdfSaveId : activePdfSaveId,
+					activePdfSaveName: activePdfSaveName,
+					beforeCallback: beforeCallback,
+          afterCallback: afterCallback
+        }) ;
 
 
 			})
@@ -48,6 +59,8 @@ angular.module('htmlToPdfSave')
             var elem = $pdfStorage.pdfSaveContents ;
             var broadcastedId = args.activePdfSaveId ;
             var broadcastedName = args.activePdfSaveName || 'default.pdf';
+            var beforeCallback = args.beforeCallback;
+            var afterCallback = args.afterCallback;
 
 
 
@@ -92,9 +105,7 @@ angular.module('htmlToPdfSave')
             var quotes = $('div[pdf-save-content='+id+']')[0];
                 html2canvas(quotes, {
                     onpreloaded: function(){ /* set parent overflow to visible */ 
-                      $(quotes).find('table:first').parent().css({
-                        "overflow":"visible","height":'auto','width': 'auto'
-                      });
+                      beforeCallback && beforeCallback();
                     },
                     onrendered: function(canvas) {
                     var pdf = new jsPDF('p', 'pt', 'letter');
@@ -137,12 +148,7 @@ angular.module('htmlToPdfSave')
                     //! after the for loop is finished running, we save the pdf.
                     pdf.save(broadcastedName);
 
-                    // reverted to original CSS 
-                    $(quotes).find('table:first').parent().css({
-                      'overflow': 'scroll',
-                      'height': $(quotes).attr('originalHeight'),
-                      'width': $(quotes).attr('originalWidth')
-                    });
+                    afterCallback && afterCallback();
                 }
               });
             /*var element = $('[pdf-save-content='+id+']') ,

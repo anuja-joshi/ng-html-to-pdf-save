@@ -4,6 +4,10 @@ angular.module('htmlToPdfSave')
 
 	return {
 		restrict: 'A',
+		scope: {
+      beforeCallback:'&beforeCallback',
+      afterCallback: '&afterCallback',
+    },
 		link : function(scope , element , attrs ) {
 			$pdfStorage.pdfSaveButtons.push(element) ;
 
@@ -11,7 +15,14 @@ angular.module('htmlToPdfSave')
 			element.on('click' , function() {
 				var activePdfSaveId = attrs.pdfSaveButton ;
 				var activePdfSaveName = attrs.pdfName;
-				$rootScope.$broadcast('savePdfEvent' , {activePdfSaveId : activePdfSaveId, activePdfSaveName: activePdfSaveName}) ;
+				var beforeCallback = scope.beforeCallback;
+        var afterCallback = scope.afterCallback;
+				$rootScope.$broadcast('savePdfEvent' , {
+					activePdfSaveId : activePdfSaveId,
+					activePdfSaveName: activePdfSaveName,
+					beforeCallback: beforeCallback,
+          afterCallback: afterCallback
+        }) ;
 
 
 			})
