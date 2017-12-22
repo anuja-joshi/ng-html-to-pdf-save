@@ -63,8 +63,9 @@ angular.module('htmlToPdfSave')
                 html2canvas(quotes, {
                     onpreloaded: function(){ /* set parent overflow to visible */ 
                       $(quotes).find('table:first').parent().css({
-                        "overflow":"visible","height":'auto','width': 'auto'
+                        "overflow":"visible",'width': 'auto', 'max-height': 'unset'
                       });
+                      $('.ds-pdf-header').removeClass('hide');
                     },
                     onrendered: function(canvas) {
                     var pdf = new jsPDF('p', 'pt', 'letter');
@@ -110,9 +111,10 @@ angular.module('htmlToPdfSave')
                     // reverted to original CSS 
                     $(quotes).find('table:first').parent().css({
                       'overflow': 'scroll',
-                      'height': $(quotes).attr('originalHeight'),
+                      'max-height': $(quotes).attr('originalHeight'),
                       'width': $(quotes).attr('originalWidth')
                     });
+                    $('.ds-pdf-header').addClass('hide');
                 }
               });
             /*var element = $('[pdf-save-content='+id+']') ,
